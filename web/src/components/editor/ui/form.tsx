@@ -1,65 +1,97 @@
-import type { MemberType } from "../../types";
+import type { MemberType } from "@/types";
 
-import { useState, useId } from "react";
+import React, { useState } from "react";
 
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
 export default function EditorForm({
   setValue,
+  currentValue = null,
 }: {
-  setValue: (v: any[]) => void;
+  setValue: React.Dispatch<React.SetStateAction<MemberType[]>>;
+  currentValue?: MemberType | null;
 }) {
-  const [data, setData] = useState<MemberType[]>([]);
-  const [userPreviewName, setUserPreviewName] = useState<string>("User");
+  const [current, setCurrent] = useState<MemberType | null>(currentValue);
+  const [userPreviewName, setUserPreviewName] = useState<string>(
+    current?.name || "User"
+  );
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     const form = event.currentTarget;
-
-    console.log(event, form.name.value);
 
     event.preventDefault();
     event.stopPropagation();
 
-    const newRow: MemberType = {
-      name: form.name.value,
+    setCurrent({
+      name: form["first-name"].value || "",
       tag: form.tag.value,
       roles: form.roles.value.trim().split(",") || [],
       description: form.description.value,
       socials: [],
-      avatar: undefined,
-      meta: [],
-    };
+      avatar: form.avatar.value || undefined,
+      meta: form.meta.value.trim().split(",") || undefined,
+    });
 
-    setData(
+    if (current) {
       setValue((data) => [
-        newRow,
+        current,
         ...data.filter((r) => r.tag !== form.tag.value),
-      ]),
-    );
+      ]);
+    }
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit} className="row g-3">
       <EditorFormInput
-        onChange={(e) => setUserPreviewName(e.target.value || "User")}
-        id="name"
+        className="mb-2 col-6"
+        id="first-name"
         label="First name"
+        defaultValue={currentValue?.name}
+        onChange={(
+          e: React.ChangeEvent<Element & Partial<HTMLInputElement>>
+        ) => {
+          const value = e.target.value;
+          setUserPreviewName(value || "User");
+        }}
       />
-      <EditorFormInput id="tag" label={`${userPreviewName}'s tag`} />
       <EditorFormInput
-        id="description"
-        label={`${userPreviewName}'s description`}
+        id="tag"
+        className="mb-2 col-6"
+        label={`${userPreviewName}'s tag`}
+        defaultValue={currentValue?.tag}
       />
       <EditorFormInput
         id="roles"
+        className="mb-2 col-12"
         label={`${userPreviewName}'s roles`}
-        defaultValue="Intern"
         placeholder="Frontend Developer, Designer, Sound Producer"
+        defaultValue={currentValue?.roles.join(",") || "Intern"}
+      />
+      <EditorFormInput
+        id="description"
+        type="textarea"
+        className="mb-2 col-12"
+        label={`${userPreviewName}'s description`}
+        defaultValue={currentValue?.description}
+      />
+      <EditorFormInput
+        id="avatar"
+        className="mb-2 col-8"
+        label={`${userPreviewName}'s avatar URL`}
+        placeholder={`https://example.com/${userPreviewName.toLowerCase()}.png`}
+        defaultValue={currentValue?.avatar}
+      />
+      <EditorFormInput
+        id="meta"
+        className="mb-2 col-4"
+        label={`${userPreviewName}'s meta`}
+        placeholder="no-gh,no-roles"
+        defaultValue={currentValue?.meta?.join(",") || "no-gh"}
       />
 
-      <Button variant="primary" type="submit">
-        Добавить участника
+      <Button className="mt-4" variant="primary" type="submit">
+        Добавить или изменить участника
       </Button>
     </Form>
   );
@@ -72,24 +104,32 @@ function EditorFormInput({
   placeholder,
   description,
   defaultValue,
+  className,
   onChange,
 }: {
   id: string;
   label: string;
-  type: string;
+  type?: string;
   placeholder?: string;
   description?: string;
+  className?: string;
   defaultValue?: string;
-  onChange?: (e: any) => void;
+  onChange?: (e: React.ChangeEvent) => void;
 }) {
   return (
-    <Form.Group className="mb-3" controlId={id}>
+    <Form.Group className={className || "mb-3"} controlId={id}>
       {label && <Form.Label>{label}</Form.Label>}
       <Form.Control
         type={type}
         placeholder={placeholder || label}
         defaultValue={defaultValue}
         onChange={onChange}
+        {...(type === "textarea"
+          ? {
+              as: "textarea",
+              rows: 3,
+            }
+          : {})}
       />
       <Form.Text className="text-muted">{description}</Form.Text>
     </Form.Group>

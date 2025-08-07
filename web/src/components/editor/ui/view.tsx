@@ -1,10 +1,14 @@
-import type { MemberType } from "../../types";
+import type { MemberType } from "@/types";
 
-import { useState } from "react";
+import { Badge, Table } from "react-bootstrap";
 
-import { Table, Badge } from "react-bootstrap";
-
-export default function EditorView({ members }: { members: MemberType[] }) {
+export default function EditorView({
+  members,
+  openEditor = () => {},
+}: {
+  members: MemberType[];
+  openEditor?: (memberId: string) => void;
+}) {
   return (
     <Table striped bordered hover>
       <thead>
@@ -20,7 +24,7 @@ export default function EditorView({ members }: { members: MemberType[] }) {
       </thead>
       <tbody>
         {members.map((member) => (
-          <tr key={member.tag}>
+          <tr key={member.tag} onClick={() => openEditor(member.tag)}>
             <td>
               <img
                 width={32}
@@ -45,7 +49,11 @@ export default function EditorView({ members }: { members: MemberType[] }) {
             <td>
               <Badge bg="primary">{member.roles.slice(0, 1)}</Badge>
             </td>
-            <td>{member.roles.join(", ")}</td>
+            <td>
+              {member.meta?.includes("no-roles")
+                ? "~"
+                : member.roles.join(", ")}
+            </td>
             <td>
               {member.meta?.map((meta) => (
                 <Badge key={meta} bg="secondary">
