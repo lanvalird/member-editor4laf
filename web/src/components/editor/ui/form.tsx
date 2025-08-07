@@ -2,15 +2,16 @@ import type { MemberType } from "@/types";
 
 import React, { useState } from "react";
 
-import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
 export default function EditorForm({
-  setValue,
+  onSave,
   currentValue = null,
+  children,
 }: {
-  setValue: React.Dispatch<React.SetStateAction<MemberType[]>>;
+  onSave: (member: MemberType) => void;
   currentValue?: MemberType | null;
+  children?: React.ReactNode;
 }) {
   const [current, setCurrent] = useState<MemberType | null>(currentValue);
   const [userPreviewName, setUserPreviewName] = useState<string>(
@@ -18,12 +19,12 @@ export default function EditorForm({
   );
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    const form = event.currentTarget;
-
     event.preventDefault();
     event.stopPropagation();
 
-    setCurrent({
+    const form = event.currentTarget;
+
+    const newMember = {
       name: form["first-name"].value || "",
       tag: form.tag.value,
       roles: form.roles.value.trim().split(",") || [],
@@ -31,13 +32,12 @@ export default function EditorForm({
       socials: [],
       avatar: form.avatar.value || undefined,
       meta: form.meta.value.trim().split(",") || undefined,
-    });
+    };
+
+    onSave(newMember);
 
     if (current) {
-      setValue((data) => [
-        current,
-        ...data.filter((r) => r.tag !== form.tag.value),
-      ]);
+      setCurrent(newMember);
     }
   };
 
@@ -89,10 +89,7 @@ export default function EditorForm({
         placeholder="no-gh,no-roles"
         defaultValue={currentValue?.meta?.join(",") || "no-gh"}
       />
-
-      <Button className="mt-4" variant="primary" type="submit">
-        Добавить или изменить участника
-      </Button>
+      {children}
     </Form>
   );
 }
