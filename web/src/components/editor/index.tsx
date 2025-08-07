@@ -1,7 +1,7 @@
 import type { MembersType } from "../types";
 
 import { lazy, useState, Suspense } from "react";
-import { Spinner } from "react-bootstrap";
+import { ProgressBar } from "react-bootstrap";
 
 const EditorView = lazy(() => import("./ui/view"));
 const EditorForm = lazy(() => import("./ui/form"));
@@ -79,19 +79,20 @@ export default function Editor() {
   const [data, setData] = useState<MemberType>(members);
 
   return (
-    <Suspense fallback={<Loading />}>
-      <div>
+    <div>
+      {" "}
+      <Suspense fallback={<Loading />}>
         <EditorForm setValue={setData} />
-        <EditorView members={data} />
-      </div>
-    </Suspense>
+      </Suspense>
+      <EditorView members={data} />
+    </div>
   );
 }
 
 function Loading() {
   return (
-    <div className="w-100 h-100 d-inline-flex justify-content-center align-items-center">
-      <Spinner className="my-auto" animation="border" variant="primary" />
+    <div className="w-100 h-100">
+      <ProgressBar animated now={100} />
     </div>
   );
 }

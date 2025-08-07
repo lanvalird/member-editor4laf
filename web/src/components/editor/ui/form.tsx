@@ -11,6 +11,7 @@ export default function EditorForm({
   setValue: (v: any[]) => void;
 }) {
   const [data, setData] = useState<MemberType[]>([]);
+  const [userPreviewName, setUserPreviewName] = useState<string>("User");
 
   const handleSubmit = (event) => {
     const form = event.currentTarget;
@@ -22,23 +23,43 @@ export default function EditorForm({
 
     const newRow: MemberType = {
       name: form.name.value,
-      tag: "",
-      roles: [],
-      description: "",
+      tag: form.tag.value,
+      roles: form.roles.value.trim().split(",") || [],
+      description: form.description.value,
       socials: [],
       avatar: undefined,
       meta: [],
     };
 
-    setData(setValue((data) => [newRow, ...data]));
+    setData(
+      setValue((data) => [
+        newRow,
+        ...data.filter((r) => r.tag !== form.tag.value),
+      ]),
+    );
   };
 
   return (
     <Form onSubmit={handleSubmit}>
-      <EditorFormInput id="name" label="First name" />
+      <EditorFormInput
+        onChange={(e) => setUserPreviewName(e.target.value || "User")}
+        id="name"
+        label="First name"
+      />
+      <EditorFormInput id="tag" label={`${userPreviewName}'s tag`} />
+      <EditorFormInput
+        id="description"
+        label={`${userPreviewName}'s description`}
+      />
+      <EditorFormInput
+        id="roles"
+        label={`${userPreviewName}'s roles`}
+        defaultValue="Intern"
+        placeholder="Frontend Developer, Designer, Sound Producer"
+      />
 
       <Button variant="primary" type="submit">
-        Submit
+        Добавить участника
       </Button>
     </Form>
   );
@@ -51,6 +72,7 @@ function EditorFormInput({
   placeholder,
   description,
   defaultValue,
+  onChange,
 }: {
   id: string;
   label: string;
@@ -58,6 +80,7 @@ function EditorFormInput({
   placeholder?: string;
   description?: string;
   defaultValue?: string;
+  onChange?: (e: any) => void;
 }) {
   return (
     <Form.Group className="mb-3" controlId={id}>
@@ -66,6 +89,7 @@ function EditorFormInput({
         type={type}
         placeholder={placeholder || label}
         defaultValue={defaultValue}
+        onChange={onChange}
       />
       <Form.Text className="text-muted">{description}</Form.Text>
     </Form.Group>
