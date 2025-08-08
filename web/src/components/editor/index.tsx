@@ -57,11 +57,14 @@ export default function Editor() {
           className="mt-4"
           variant="secondary"
           onClick={(e) => {
+            const el = e.target as HTMLElement;
+
             setTimeout(() => {
-              e.target.innerText = "Скопировать";
+              el.innerText = "Скопировать";
             }, 1000);
+
             navigator.clipboard.writeText(JSON.stringify(data));
-            e.target.innerText = "Скопировано!";
+            el.innerText = "Скопировано!";
           }}
         >
           Скопировать
