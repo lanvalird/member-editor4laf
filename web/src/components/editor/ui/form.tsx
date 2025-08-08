@@ -15,7 +15,7 @@ export default function EditorForm({
 }) {
   const [current, setCurrent] = useState<MemberType | null>(currentValue);
   const [userPreviewName, setUserPreviewName] = useState<string>(
-    current?.name || "User"
+    current?.name || "User",
   );
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -49,7 +49,7 @@ export default function EditorForm({
         label="First name"
         defaultValue={currentValue?.name}
         onChange={(
-          e: React.ChangeEvent<Element & Partial<HTMLInputElement>>
+          e: React.ChangeEvent<Element & Partial<HTMLInputElement>>,
         ) => {
           const value = e.target.value;
           setUserPreviewName(value || "User");

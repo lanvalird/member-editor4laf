@@ -34,21 +34,38 @@ export default function Editor() {
   return (
     <div className="row">
       <Suspense fallback={<Loading title="Загрузка редактора" />}>
-        <div className="col-6">
-          <h2 className="mt-5 mb-4">Форма добавления участника</h2>
+        <div className="d-flex flex-column col-6 pt-5 gap-4">
+          <h2>Форма добавления участника</h2>
 
           <EditorForm onSave={saveUser}>
-            <Button className="mt-4" variant="primary" type="submit">
+            <Button variant="primary" type="submit">
               Добавить или изменить участника
             </Button>
           </EditorForm>
         </div>
       </Suspense>
 
-      <div className="col-6" style={{ maxHeight: "100vh" }}>
+      <div
+        className="d-flex flex-column col-6 pt-5 gap-4"
+        style={{ maxHeight: "100vh" }}
+      >
         <h2 className="mt-5 mb-4">Итоговый JSON</h2>
 
-        <pre className="h-100">{JSON.stringify(data, undefined, 2)}</pre>
+        <pre className="max-h-100 ">{JSON.stringify(data, undefined, 2)}</pre>
+
+        <Button
+          className="mt-4"
+          variant="secondary"
+          onClick={(e) => {
+            setTimeout(() => {
+              e.target.innerText = "Скопировать";
+            }, 1000);
+            navigator.clipboard.writeText(JSON.stringify(data));
+            e.target.innerText = "Скопировано!";
+          }}
+        >
+          Скопировать
+        </Button>
       </div>
 
       <Suspense fallback={<Loading title="Загрузка просмотрщика" />}>
