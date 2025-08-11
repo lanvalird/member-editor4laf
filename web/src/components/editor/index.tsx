@@ -24,10 +24,17 @@ export default function Editor() {
     setShowModal(false);
   }
 
-  function saveUser(member: MemberType): void {
+  function saveUser(tag: string): void {
     setData((data) => {
-      const filtered = data.filter((m) => m.tag !== member.tag);
+      const filtered = data.filter((m) => m.tag !== tag);
       return [member, ...filtered];
+    });
+  }
+
+  function deleteUser(tag: string): void {
+    setData((data) => {
+      const filtered = data.filter((m) => m.tag !== tag);
+      return [...filtered];
     });
   }
 
@@ -75,7 +82,11 @@ export default function Editor() {
         <div className="col-12">
           <h2 className="mt-5 mb-4">Просмотрщик данных</h2>
 
-          <EditorView members={data} openEditor={handleModalShow} />
+          <EditorView
+            members={data}
+            openEditor={handleModalShow}
+            deleteMember={deleteUser}
+          />
         </div>
       </Suspense>
 

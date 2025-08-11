@@ -1,13 +1,17 @@
 import type { MemberType } from "@/types";
 
-import { Badge, Table } from "react-bootstrap";
+import { Badge, Button, Table } from "react-bootstrap";
+
+import { deleteUserFromList } from "../func/delete-user-from-list";
 
 export default function EditorView({
   members,
   openEditor = () => {},
+  deleteMember = () => {},
 }: {
   members: MemberType[];
   openEditor?: (memberId: string) => void;
+  deleteMember?: (memberId: string) => void;
 }) {
   return (
     <Table striped bordered hover>
@@ -20,11 +24,12 @@ export default function EditorView({
           <th>General role</th>
           <th>All roles</th>
           <th>Meta</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
         {members.map((member) => (
-          <tr key={member.tag} onClick={() => openEditor(member.tag)}>
+          <tr key={member.tag}>
             <td>
               <img
                 width={32}
@@ -60,6 +65,16 @@ export default function EditorView({
                   {meta}
                 </Badge>
               ))}
+            </td>
+            <td>
+              {deleteMember && (
+                <Button
+                  variant="secondary"
+                  onClick={() => deleteMember(member.tag)}
+                >
+                  x
+                </Button>
+              )}
             </td>
           </tr>
         ))}
