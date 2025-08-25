@@ -71,7 +71,10 @@ export default function EditorView({
               {deleteMember && (
                 <Button
                   variant="secondary"
-                  onClick={() => deleteMember(member.tag)}
+                  onClick={(event) => (
+                    event.stopPropagation && event.stopPropagation(),
+                    deleteMember(member.tag)
+                  )}
                 >
                   x
                 </Button>
