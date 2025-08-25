@@ -2,8 +2,6 @@ import type { MemberType } from "@/types";
 
 import { Badge, Button, Table } from "react-bootstrap";
 
-import { deleteUserFromList } from "../func/delete-user-from-list";
-
 export default function EditorView({
   members,
   openEditor = () => {},
@@ -29,7 +27,10 @@ export default function EditorView({
       </thead>
       <tbody>
         {members.map((member) => (
-          <tr key={member.tag}>
+          <tr
+            key={member.tag}
+            onClick={openEditor ? () => openEditor(member.tag) : undefined}
+          >
             <td>
               <img
                 width={32}

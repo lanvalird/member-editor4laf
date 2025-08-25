@@ -24,9 +24,10 @@ export default function Editor() {
     setShowModal(false);
   }
 
-  function saveUser(tag: string): void {
+  function saveUser(member: MemberType): void {
     setData((data) => {
-      const filtered = data.filter((m) => m.tag !== tag);
+      const filtered = data.filter((m) => m.tag !== member.tag);
+
       return [member, ...filtered];
     });
   }

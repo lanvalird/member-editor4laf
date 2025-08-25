@@ -9,7 +9,7 @@ export default function EditorForm({
   currentValue = null,
   children,
 }: {
-  onSave: (tag: string) => void;
+  onSave: (member: MemberType) => void;
   currentValue?: MemberType | null;
   children?: React.ReactNode;
 }) {
@@ -34,7 +34,7 @@ export default function EditorForm({
       meta: form.meta.value.trim().split(",") || undefined,
     };
 
-    onSave(newMember.tag);
+    onSave(newMember);
 
     if (current) {
       setCurrent(newMember);
