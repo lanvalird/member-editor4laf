@@ -1,4 +1,4 @@
-import type { MemberType } from "@/types";
+import type { Member } from "@/types";
 
 import React, { useState } from "react";
 
@@ -9,11 +9,11 @@ export default function EditorForm({
   currentValue = null,
   children,
 }: {
-  onSave: (member: MemberType) => void;
-  currentValue?: MemberType | null;
+  onSave: (member: Member) => void;
+  currentValue?: Member | null;
   children?: React.ReactNode;
 }) {
-  const [current, setCurrent] = useState<MemberType | null>(currentValue);
+  const [current, setCurrent] = useState<Member | null>(currentValue);
   const [userPreviewName, setUserPreviewName] = useState<string>(
     current?.name || "User",
   );

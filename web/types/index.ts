@@ -1,4 +1,4 @@
-export type MemberType = {
+export type Member = {
   // Identification
   name: string;
   tag: string;
@@ -12,3 +12,5 @@ export type MemberType = {
   avatar?: string;
   meta?: string[];
 };
+
+export type MemberList = Member[];

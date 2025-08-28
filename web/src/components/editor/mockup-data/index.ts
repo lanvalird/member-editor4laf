@@ -1,6 +1,6 @@
-import type { MemberType } from "@/types";
+import type { Member } from "@/types";
 
-export const members: MemberType[] = [
+export const members: Member[] = [
   {
     tag: "fockusty",
     name: "FOCKUSTY",
@@ -20,16 +20,6 @@ export const members: MemberType[] = [
       "https://twitter.com/fockusty",
       "https://pinterest.com/fockusty/",
     ],
-  },
-  {
-    tag: "adelya",
-    name: "Adelya",
-    roles: ["HR Менеджер"],
-    avatar: "https://laf-team.ru/images/avatars/adelya.webp",
-    description:
-      "Я — Адэля и попала в эту команду немного случайно. Являюсь менеджером данной команды, мне сказали, чтобы я заставляла работать всех ленивцев",
-    socials: ["https://t.me/Angels13a"],
-    meta: ["no-gh"],
   },
   {
     tag: "lanvalird",

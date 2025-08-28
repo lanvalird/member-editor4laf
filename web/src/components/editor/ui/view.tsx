@@ -1,88 +1,134 @@
-import type { MemberType } from "@/types";
-
+import React, { useContext } from "react";
 import { Badge, Button, Table } from "react-bootstrap";
+import { EditorContext } from "../context";
+
+const TABLE_HEADINGS: string[] = [
+  "Avatar",
+  "First Name",
+  "User's tag",
+  "Description",
+  "All roles",
+  "Meta",
+  "",
+];
 
 export default function EditorView({
-  members,
   openEditor = () => {},
-  deleteMember = () => {},
+  deleteMember = () => {}
 }: {
-  members: MemberType[];
-  openEditor?: (memberId: string) => void;
-  deleteMember?: (memberId: string) => void;
+  openEditor: (memberTaq: string) => void;
+  deleteMember: (memberTaq: string) => void;
 }) {
+  const headings = TABLE_HEADINGS;
+
+  const editorCtx = useContext(EditorContext);
+  const members = editorCtx.members;
+
+  function handleChangeMember(tag: string) {
+    openEditor(tag);
+  }
+
+  function handleMemberDelete(tag: string) {
+    deleteMember(tag);
+  }
+
   return (
     <Table striped bordered hover>
-      <thead>
-        <tr>
-          <th>Avatar</th>
-          <th>First Name</th>
-          <th>User's tag</th>
-          <th>Description</th>
-          <th>General role</th>
-          <th>All roles</th>
-          <th>Meta</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
+      <TableHeader>
+        <TableRow>
+          {headings.map((heading) => (
+            <th key={heading}>{heading}</th>
+          ))}
+        </TableRow>
+      </TableHeader>
+      <TableBody>
         {members.map((member) => (
-          <tr
+          <TableRow
             key={member.tag}
-            onClick={openEditor ? () => openEditor(member.tag) : undefined}
+            onClick={() => handleChangeMember(member.tag)}
           >
-            <td>
-              <img
-                width={32}
-                height={32}
-                className={"rounded-2"}
-                src={
-                  member.avatar ||
-                  "https://laf-team.ru/images/avatars/default.webp"
-                }
-              />
-            </td>
-            <td>{member.name}</td>
-            <td>{member.tag}</td>
-            <td
+            <TableData
+              style={{
+                width: ".25rem",
+              }}
+            >
+              <MemberAvatar src={member.avatar} alt={member.tag} />
+            </TableData>
+
+            <TableData>{member.name}</TableData>
+            <TableData>{member.tag}</TableData>
+            <TableData
               style={{
                 minWidth: "360px",
                 width: "35%",
               }}
             >
               {member.description}
-            </td>
-            <td>
-              <Badge bg="primary">{member.roles.slice(0, 1)}</Badge>
-            </td>
-            <td>
-              {member.meta?.includes("no-roles")
-                ? "~"
-                : member.roles.join(", ")}
-            </td>
-            <td>
-              {member.meta?.map((meta) => (
-                <Badge key={meta} bg="secondary">
-                  {meta}
-                </Badge>
-              ))}
-            </td>
-            <td>
-              {deleteMember && (
-                <Button
-                  variant="secondary"
-                  onClick={(event) => (
-                    event.stopPropagation && event.stopPropagation(),
-                    deleteMember(member.tag)
-                  )}
-                >
-                  x
-                </Button>
-              )}
-            </td>
-          </tr>
+            </TableData>
+
+            <TableData>
+              <Badge>{member.roles[0]}</Badge>
+              {member.roles.length > 1 ? ", " : null}
+              {member.roles.slice(1).join(", ")}
+            </TableData>
+
+            <TableData>{member.meta}</TableData>
+            <TableData>
+              <Button
+                onClick={(event: React.MouseEvent) => {
+                  event.stopPropagation();
+                  handleMemberDelete(member.tag);
+                }}
+              >
+                x
+              </Button>
+            </TableData>
+          </TableRow>
         ))}
-      </tbody>
+      </TableBody>
     </Table>
+  );
+}
+
+function TableHeader({ children }: { children: React.ReactNode }) {
+  return <thead>{children}</thead>;
+}
+
+function TableBody({ children }: { children: React.ReactNode }) {
+  return <tbody>{children}</tbody>;
+}
+
+function TableRow({
+  children,
+  ...props
+}: {
+  children: React.ReactNode;
+  onClick?: (event: React.MouseEvent) => void;
+}) {
+  return <tr {...props}>{children}</tr>;
+}
+
+function TableData({
+  children,
+  ...props
+}: {
+  children: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  return <td {...props}>{children || <em>none</em>}</td>;
+}
+
+function MemberAvatar({ src, alt }: Partial<{ src: string; alt: string }>) {
+  if (!src) {
+    src = "https://laf-team.ru/images/avatars/default.webp";
+  }
+
+  return (
+    <img
+      className="w-100 ratio ratio-1x1 rounded-2"
+      src={src}
+      alt={alt || "Member's Avatar"}
+    />
   );
 }
