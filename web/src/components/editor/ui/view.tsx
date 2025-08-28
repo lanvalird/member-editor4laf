@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { Badge, Button, Table } from "react-bootstrap";
+
 import { EditorContext } from "../context";
 
 const TABLE_HEADINGS: string[] = [
@@ -14,7 +15,7 @@ const TABLE_HEADINGS: string[] = [
 
 export default function EditorView({
   openEditor = () => {},
-  deleteMember = () => {}
+  deleteMember = () => {},
 }: {
   openEditor: (memberTaq: string) => void;
   deleteMember: (memberTaq: string) => void;
@@ -72,7 +73,7 @@ export default function EditorView({
               {member.roles.slice(1).join(", ")}
             </TableData>
 
-            <TableData>{member.meta}</TableData>
+            <TableData>{member.meta?.join(", ")}</TableData>
             <TableData>
               <Button
                 onClick={(event: React.MouseEvent) => {

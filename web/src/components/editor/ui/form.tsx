@@ -1,21 +1,22 @@
 import type { Member } from "@/types";
 
 import React, { useState } from "react";
-
 import Form from "react-bootstrap/Form";
 
 export default function EditorForm({
-  onSave,
-  currentValue = null,
+  saveMember,
+  currentMember: currentMemberProp = null,
   children,
 }: {
-  onSave: (member: Member) => void;
-  currentValue?: Member | null;
+  saveMember: (member: Member) => void;
+  currentMember?: Member | null;
   children?: React.ReactNode;
 }) {
-  const [current, setCurrent] = useState<Member | null>(currentValue);
+  const [currentMember, setCurrentMember] = useState<Member | null>(
+    currentMemberProp
+  );
   const [userPreviewName, setUserPreviewName] = useState<string>(
-    current?.name || "User",
+    currentMember?.name || "User"
   );
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -24,7 +25,7 @@ export default function EditorForm({
 
     const form = event.currentTarget;
 
-    const newMember = {
+    const member = {
       name: form["first-name"].value || "",
       tag: form.tag.value,
       roles: form.roles.value.trim().split(",") || [],
@@ -34,10 +35,10 @@ export default function EditorForm({
       meta: form.meta.value.trim().split(",") || undefined,
     };
 
-    onSave(newMember);
+    saveMember(member);
 
-    if (current) {
-      setCurrent(newMember);
+    if (currentMember) {
+      setCurrentMember(member);
     }
   };
 
@@ -47,9 +48,9 @@ export default function EditorForm({
         className="mb-2 col-6"
         id="first-name"
         label="First name"
-        defaultValue={currentValue?.name}
+        defaultValue={currentMember?.name}
         onChange={(
-          e: React.ChangeEvent<Element & Partial<HTMLInputElement>>,
+          e: React.ChangeEvent<Element & Partial<HTMLInputElement>>
         ) => {
           const value = e.target.value;
           setUserPreviewName(value || "User");
@@ -59,40 +60,53 @@ export default function EditorForm({
         id="tag"
         className="mb-2 col-6"
         label={`${userPreviewName}'s tag`}
-        defaultValue={currentValue?.tag}
+        defaultValue={currentMember?.tag}
       />
       <EditorFormInput
         id="roles"
         className="mb-2 col-12"
         label={`${userPreviewName}'s roles`}
         placeholder="Frontend Developer, Designer, Sound Producer"
-        defaultValue={currentValue?.roles.join(",") || "Intern"}
+        defaultValue={currentMember?.roles.join(",") || "Intern"}
       />
       <EditorFormInput
         id="description"
         type="textarea"
         className="mb-2 col-12"
         label={`${userPreviewName}'s description`}
-        defaultValue={currentValue?.description}
+        defaultValue={currentMember?.description}
       />
       <EditorFormInput
         id="avatar"
         className="mb-2 col-8"
         label={`${userPreviewName}'s avatar URL`}
         placeholder={`https://example.com/${userPreviewName.toLowerCase()}.png`}
-        defaultValue={currentValue?.avatar}
+        defaultValue={currentMember?.avatar}
       />
       <EditorFormInput
         id="meta"
         className="mb-2 col-4"
         label={`${userPreviewName}'s meta`}
         placeholder="no-gh,no-roles"
-        defaultValue={currentValue?.meta?.join(",") || undefined}
+        defaultValue={currentMember?.meta?.join(",") || undefined}
       />
       {children}
     </Form>
   );
 }
+
+type EditorFormInputProps = {
+  id: string;
+  label: string;
+} & Partial<{
+  type: string;
+  placeholder: string;
+  description: string;
+  className: string;
+  defaultValue: string;
+
+  onChange: (event: React.ChangeEvent) => void;
+}>;
 
 function EditorFormInput({
   id,
@@ -103,16 +117,7 @@ function EditorFormInput({
   defaultValue,
   className,
   onChange,
-}: {
-  id: string;
-  label: string;
-  type?: string;
-  placeholder?: string;
-  description?: string;
-  className?: string;
-  defaultValue?: string;
-  onChange?: (e: React.ChangeEvent) => void;
-}) {
+}: EditorFormInputProps) {
   return (
     <Form.Group className={className || "mb-3"} controlId={id}>
       {label && <Form.Label>{label}</Form.Label>}

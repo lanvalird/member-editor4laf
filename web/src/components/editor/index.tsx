@@ -1,50 +1,52 @@
-import type { Member } from "@/types";
+import type { Member, MemberList } from "@/types";
 
 import { lazy, Suspense, useId, useState } from "react";
 import { Button, Modal, ProgressBar } from "react-bootstrap";
 import { members } from "./mockup-data";
 import { EditorContext } from "./context";
+import { EditorJson } from "./ui/json";
 
 const EditorView = lazy(() => import("./ui/view"));
 const EditorForm = lazy(() => import("./ui/form"));
 
 export default function Editor() {
-  const [data, setData] = useState<Member[]>(members);
-  const [isOpenModal, setOpenModal] = useState(false);
-  const [activeMember, setActiveMember] = useState<Member | null>(null);
+  const [memberList, setMemberList] = useState<MemberList>(members);
+  const [currentMember, setActiveMember] = useState<Member | null>(null);
 
+  const [isOpenModal, setOpenModal] = useState(false);
   const modalSubmitId = useId();
 
-  function handleModalShow(memberId: string): void {
-    setActiveMember(data.find((member) => member.tag === memberId) || null);
+  function openModal(memberId: string): void {
+    setActiveMember(
+      memberList.find((member) => member.tag === memberId) || null
+    );
     setOpenModal(true);
   }
 
-  function handleModalClose(): void {
+  function closeModal(): void {
     setActiveMember(null);
     setOpenModal(false);
   }
 
-  function saveUser(member: Member): void {
-    setData((data) => {
-      const filtered = data.filter((m) => m.tag !== member.tag);
+  function saveUser({ tag, ...data }: Member): void {
+    setMemberList((members) => {
+      const filtered = members.filter((member) => member.tag !== tag);
 
-      return [member, ...filtered];
+      return [{ tag, ...data }, ...filtered];
     });
   }
 
   function deleteUser(tag: string): void {
-    setData((data) => {
-      const filtered = data.filter((m) => m.tag !== tag);
+    setMemberList((members) => {
+      const filtered = members.filter((m) => m.tag !== tag);
       return [...filtered];
     });
-    console.log (data)
   }
 
   return (
     <EditorContext
       value={{
-        members: data,
+        members: memberList,
       }}
     >
       <div className="row">
@@ -52,7 +54,7 @@ export default function Editor() {
           <div className="d-flex flex-column col-6 pt-5 gap-4">
             <h2>Форма добавления участника</h2>
 
-            <EditorForm onSave={saveUser}>
+            <EditorForm saveMember={saveUser}>
               <Button variant="primary" type="submit">
                 Добавить или изменить участника
               </Button>
@@ -60,40 +62,15 @@ export default function Editor() {
           </div>
         </Suspense>
 
-        <div
-          className="d-flex flex-column col-6 pt-5 gap-4"
-          style={{ maxHeight: "100vh" }}
-        >
-          <h2 className="mt-5 mb-4">Итоговый JSON</h2>
-
-          <pre className="max-h-100 ">{JSON.stringify(data, undefined, 2)}</pre>
-
-          <Button
-            className="mt-4"
-            variant="secondary"
-            onClick={(e) => {
-              const el = e.target as HTMLElement;
-
-              setTimeout(() => {
-                el.innerText = "Скопировать";
-              }, 1000);
-
-              navigator.clipboard.writeText(JSON.stringify(data));
-              el.innerText = "Скопировано!";
-            }}
-          >
-            Скопировать
-          </Button>
-        </div>
+        <Suspense fallback={<Loading title={"JSON сейчас отобразится"} />}>
+          <EditorJson />
+        </Suspense>
 
         <Suspense fallback={<Loading title="Загрузка просмотрщика" />}>
           <div className="col-12">
             <h2 className="mt-5 mb-4">Просмотрщик данных</h2>
 
-            <EditorView
-              openEditor={handleModalShow}
-              deleteMember={deleteUser}
-            />
+            <EditorView openEditor={openModal} deleteMember={deleteUser} />
           </div>
         </Suspense>
 
@@ -105,12 +82,12 @@ export default function Editor() {
         >
           <Modal.Header>
             <Modal.Title>
-              Настройка пользователя {activeMember?.name} (@
-              {activeMember?.tag.toLowerCase()})
+              Настройка пользователя {currentMember?.name} (@
+              {currentMember?.tag.toLowerCase()})
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <EditorForm onSave={saveUser} currentValue={activeMember}>
+            <EditorForm saveMember={saveUser} currentMember={currentMember}>
               <Button
                 id={modalSubmitId}
                 className="d-none mt-4"
@@ -126,7 +103,7 @@ export default function Editor() {
               e.preventDefault();
             }}
           >
-            <Button variant="secondary" onClick={handleModalClose}>
+            <Button variant="secondary" onClick={closeModal}>
               Отмена
             </Button>
             <Button
@@ -137,7 +114,7 @@ export default function Editor() {
                     `#${modalSubmitId}`
                   ) as HTMLButtonElement
                 ).click();
-                handleModalClose();
+                closeModal();
               }}
             >
               Сохранить

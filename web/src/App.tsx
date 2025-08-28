@@ -6,7 +6,7 @@ const Editor = lazy(() => import("./components/editor"));
 function App() {
   return (
     <Suspense fallback={<Loading />}>
-      <div className="container-md">
+      <div className="min-h-100 container-md">
         <Editor />
       </div>
     </Suspense>

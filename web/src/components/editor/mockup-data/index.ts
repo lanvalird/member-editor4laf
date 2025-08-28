@@ -1,6 +1,6 @@
-import type { Member } from "@/types";
+import type { MemberList } from "@/types";
 
-export const members: Member[] = [
+export const members: MemberList = [
   {
     tag: "fockusty",
     name: "FOCKUSTY",
