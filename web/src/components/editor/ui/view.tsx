@@ -76,6 +76,7 @@ export default function EditorView({
             <TableData>{member.meta?.join(", ")}</TableData>
             <TableData>
               <Button
+                variant="danger"
                 onClick={(event: React.MouseEvent) => {
                   event.stopPropagation();
                   handleMemberDelete(member.tag);
